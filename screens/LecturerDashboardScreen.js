@@ -3,9 +3,10 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import styles from "../styles";
-import {logout} from "../api";
+import {useAuth} from "../context/AuthContext";
 
 export default function LecturerDashboardScreen({ navigation }) {
+    const { logout } = useAuth();
     const handleLogout = async () => {
         await logout(); // Perform logout
         navigation.navigate('LoginScreen'); // Navigate to login screen
