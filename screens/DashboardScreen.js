@@ -41,7 +41,7 @@ import {clearAuth} from "../store";
 import {logout} from "../api";
 import {useDispatch, useSelector} from "react-redux";
 
-export default function AdminDashboardScreen({ navigation }) {
+export default function DashboardScreen({ navigation }) {
 
         const user = useSelector(state => state.auth.user);
     const dispatch = useDispatch();
@@ -58,7 +58,7 @@ export default function AdminDashboardScreen({ navigation }) {
     return (
         <View style={[styles.container, localStyles.centeredContainer]}>
             <Text style={styles.title}>Admin Dashboard</Text>
-            <CustomButton title="Take Attendance" onPress={() => navigation.navigate('Attendance')} />
+            <CustomButton title="Take Attendance" onPress={() => navigation.navigate('LecturerTakeAttendanceScreen')} />
             <CustomButton title="Manage Years" onPress={() => navigation.navigate('YearManagement')} />
             <CustomButton title="Manage Programs" onPress={() => navigation.navigate('ProgramManagement')} />
             <CustomButton title="Manage Modules" onPress={() => navigation.navigate('ModuleManagement')} />
@@ -73,7 +73,7 @@ export default function AdminDashboardScreen({ navigation }) {
             />
             <CustomButton
                 title="View Attendance"
-                onPress={() => navigation.navigate('ViewAttendance', { userType: 'admin' })}
+                onPress={() => navigation.navigate('LecturerViewAttendanceScreen', { userType: 'admin' })}
             />
             <CustomButton
                 title="Profile"

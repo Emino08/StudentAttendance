@@ -3,25 +3,27 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import styles from "../styles";
+import {logout} from "../api";
 
 export default function StudentDashboardScreen({ navigation }) {
+    const handleLogout = async () => {
+        await logout(); // Perform logout
+        navigation.navigate('LoginScreen'); // Navigate to login screen
+    };
     return (
-        <View style={[styles.container, localStyles.centeredContainer]}>
+        <View style={styles.container}>
             <Text style={styles.title}>Student Dashboard</Text>
             <CustomButton
                 title="View Attendance"
-                onPress={() => navigation.navigate('ViewAttendance', { userType: 'student' })}
+                onPress={() => navigation.navigate('StudentAttendance', { userType: 'student' })}
             />
             <CustomButton
                 title="Profile"
-                onPress={() => navigation.navigate('Profile')}
+                onPress={() => navigation.navigate('ProfileScreen')}
             />
             <CustomButton
                 title="Logout"
-                onPress={() => {
-                    // Implement logout functionality
-                    navigation.replace('Login');
-                }}
+                onPress={handleLogout}
             />
         </View>
     );

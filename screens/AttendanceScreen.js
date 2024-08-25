@@ -1,7 +1,7 @@
 // screens/AttendanceScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import { getStudents, getLecturers, markStudentAttendance, markLecturerAttendance } from '../api';
 import CustomButton from '../components/CustomButton';
 import styles from "../styles";
@@ -9,7 +9,7 @@ import styles from "../styles";
 export default function AttendanceScreen() {
     const [attendees, setAttendees] = useState([]);
     const [selectedModule, setSelectedModule] = useState(null);
-    const user = useSelector(state => state.auth.user);
+    // const user = useSelector(state => state.auth.user);
 
     useEffect(() => {
         fetchAttendees();

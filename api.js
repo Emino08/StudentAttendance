@@ -73,6 +73,42 @@ export const logout = async () => {
     return { data: { detail: 'Successfully logged out.' } };
 };
 
+
+export const deleteStudent = async (id) => {
+    // Dummy delete student response
+    return { data: {} };
+
+}
+
+export const updateStudent = async (id, student) => {
+    // Dummy update student response
+    return {
+        data: {
+            id,
+            user: { first_name: student.user.first_name, last_name: student.user.last_name },
+            student_id: student.student_id,
+            program: student.program,
+            year: student.year,
+        },
+        }
+    }
+
+export const createStudent = async (student) => {
+
+
+    // Dummy create student response
+    return {
+        data: {
+            id: 3,
+            user: { first_name: student.user.first_name, last_name: student.user.last_name },
+            student_id: student.student_id,
+            program: student.program,
+            year: student.year,
+        },
+    };
+
+
+}
 export const getYears = async () => {
     // Dummy years response
     return {
@@ -132,6 +168,30 @@ export const deleteProgram = async (id) => {
     return { data: {} };
 };
 
+export const getAttendance = async (student_id, year_id) => {
+    // Dummy attendance response
+    return {
+        data: [
+            {
+                id: 1,
+                student: student_id,
+                module: 1,
+                year: year_id,
+                date: '2023-01-01',
+                status: 'present',
+            },
+            {
+                id: 2,
+                student: student_id,
+                module: 2,
+                year: year_id,
+                date: '2023-01-02',
+                status: 'absent',
+            },
+        ],
+    };
+}
+
 export const getModules = async () => {
     // Dummy modules response
     return {
@@ -142,6 +202,37 @@ export const getModules = async () => {
         ],
     };
 };
+
+export const updateLecturer = async (id, lecturer) => {
+    // Dummy update lecturer response
+    return {
+        data: {
+            id,
+            user: { first_name: lecturer.user.first_name, last_name: lecturer.user.last_name },
+            staff_id: lecturer.staff_id,
+        },
+    };
+};
+
+
+export const deleteLecturer = async (id) => {
+    // Dummy delete lecturer response
+    return { data: {} };
+};
+
+
+export const createLecturer = async (lecturer) => {
+    // Dummy create lecturer response
+    return {
+        data: {
+            id: 3,
+            user: { first_name: lecturer.user.first_name, last_name: lecturer.user.last_name },
+            staff_id: lecturer.staff_id,
+        },
+    };
+};
+
+
 
 export const saveAttendance = async (attendanceData) => {
     // Dummy save attendance response
@@ -246,5 +337,143 @@ export const markLecturerAttendance = async (attendanceData) => {
             date: attendanceData.date,
             status: attendanceData.status,
         },
+    };
+
+};
+
+// New functions for lecturer management
+// export const getLecturers = async () => {
+//     return {
+//         data: [
+//             { id: 1, user: { first_name: 'John', last_name: 'Doe' }, staff_id: 'L001' },
+//             { id: 2, user: { first_name: 'Jane', last_name: 'Smith' }, staff_id: 'L002' },
+//         ],
+//     };
+// };
+
+// export const createLecturer = async (lecturer) => {
+//     return {
+//         data: {
+//             id: 3,
+//             user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
+//             staff_id: lecturer.staff_id,
+//         },
+//     };
+// };
+
+// export const updateLecturer = async (id, lecturer) => {
+//     return {
+//         data: {
+//             id,
+//             user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
+//             staff_id: lecturer.staff_id,
+//         },
+//     };
+// };
+
+// export const deleteLecturer = async (id) => {
+//     return { data: {} };
+// };
+
+// Function for profile
+export const getProfile = async () => {
+    return {
+        data: {
+            id: 1,
+            username: 'johndoe',
+            email: 'johndoe@example.com',
+            first_name: 'John',
+            last_name: 'Doe',
+            role: 'lecturer',
+        },
+    };
+};
+
+export const updateProfile = async (profile) => {
+    return {
+        data: {
+            id: 1,
+            username: profile.username,
+            email: profile.email,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            role: 'lecturer',
+        },
+    };
+};
+
+// Functions for student attendance view
+export const getStudentAttendance = async (studentId) => {
+    return {
+        data: [
+            { id: 1, module: 'Mathematics', present: 10, absent: 2 },
+            { id: 2, module: 'Physics', present: 8, absent: 4 },
+        ],
+    };
+};
+
+export const getStudentAttendanceDetails = async (studentId, moduleId) => {
+    return {
+        data: [
+            { id: 1, date: '2023-08-01', status: 'present' },
+            { id: 2, date: '2023-08-02', status: 'absent' },
+            { id: 3, date: '2023-08-03', status: 'present' },
+        ],
+    };
+};
+
+// Functions for lecturer attendance view
+export const getLecturerModules = async (lecturerId) => {
+    return {
+        data: [
+            { id: 1, name: 'Mathematics' },
+            { id: 2, name: 'Physics' },
+        ],
+    };
+};
+
+export const getLecturerAttendance = async (lecturerId, moduleId) => {
+    return {
+        data: [
+            { id: 1, student: 'Alice Johnson', present: 10, absent: 2 },
+            { id: 2, student: 'Bob Smith', present: 8, absent: 4 },
+        ],
+    };
+};
+
+export const getLecturerAttendanceDetails = async (lecturerId, moduleId, studentId) => {
+    return {
+        data: [
+            { id: 1, date: '2023-08-01', status: 'present' },
+            { id: 2, date: '2023-08-02', status: 'absent' },
+            { id: 3, date: '2023-08-03', status: 'present' },
+        ],
+    };
+};
+
+// Function for lecturer to take attendance
+export const takeAttendance = async (moduleId, attendanceData) => {
+    return {
+        data: { message: 'Attendance saved successfully' },
+    };
+};
+
+// Function to get programs (for lecturer view attendance)
+// export const getPrograms = async () => {
+//     return {
+//         data: [
+//             { id: 1, name: 'Computer Science' },
+//             { id: 2, name: 'Electrical Engineering' },
+//         ],
+//     };
+// };
+
+// Function to get modules by program (for lecturer view attendance)
+export const getModulesByProgram = async (programId) => {
+    return {
+        data: [
+            { id: 1, name: 'Introduction to Programming' },
+            { id: 2, name: 'Data Structures' },
+        ],
     };
 };
