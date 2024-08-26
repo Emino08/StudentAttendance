@@ -7,6 +7,10 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f5f5f5',
     },
+    itemDetails: {
+        color: 'gray',
+        fontSize: 14,
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -107,6 +111,61 @@ const styles = StyleSheet.create({
     moduleItem: {
         marginBottom: 16,
     },
+    attendanceInfo: {
+        flexDirection: 'row',
+        justifyContent:'space-between',
+        alignItems: 'center',
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    attendanceText: {
+        color: '#333',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    attendanceInfoValue: {
+        color: '#666',
+        fontSize: 16,
+    },
+    attendanceInfoIcon: {
+        color: '#666',
+        fontSize: 24,
+    },
+    pickerItem: {
+        backgroundColor: 'white',
+        padding: 10,
+        borderRadius: 5,
+        borderColor: '#ddd',
+        borderWidth: 1,
+        color: 'black',
+    },
+    pickerItemText: {
+        color: 'black',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    checkbox: {
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 10,
+        borderBottomWidth: 2,
+        borderBottomColor: 'black',
+        backgroundColor: 'gray',
+    },
+    checkboxText: {
+        color: '#333',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    checkboxIcon: {
+        color: '#333',
+        fontSize: 24,
+        marginBottom: 5,
+    }
+
+
 });
 
 export default styles;

@@ -140,18 +140,119 @@
 // });
 
 // screens/LecturerManagementScreen.js
+// import React, { useState, useEffect } from 'react';
+// import { View, Text, FlatList, TextInput, Alert } from 'react-native';
+// import { getLecturers, createLecturer, updateLecturer, deleteLecturer } from '../api';
+// import CustomButton from '../components/CustomButton';
+// import styles from "../styles";
+//
+// export default function LecturerManagementScreen() {
+//     const [lecturers, setLecturers] = useState([]);
+//     const [newLecturer, setNewLecturer] = useState({ first_name: '', last_name: '', staff_id: '' });
+//
+//     useEffect(() => {
+//         fetchLecturers();
+//     }, []);
+//
+//     const fetchLecturers = async () => {
+//         try {
+//             const response = await getLecturers();
+//             setLecturers(response.data);
+//         } catch (error) {
+//             console.error('Failed to fetch lecturers', error);
+//             Alert.alert('Error', 'Failed to fetch lecturers. Please try again.');
+//         }
+//     };
+//
+//     const handleCreateLecturer = async () => {
+//         try {
+//             await createLecturer(newLecturer);
+//             setNewLecturer({ first_name: '', last_name: '', staff_id: '' });
+//             fetchLecturers();
+//         } catch (error) {
+//             console.error('Failed to create lecturer', error);
+//             Alert.alert('Error', 'Failed to create lecturer. Please try again.');
+//         }
+//     };
+//
+//     const handleUpdateLecturer = async (id, updatedLecturer) => {
+//         try {
+//             await updateLecturer(id, updatedLecturer);
+//             fetchLecturers();
+//         } catch (error) {
+//             console.error('Failed to update lecturer', error);
+//             Alert.alert('Error', 'Failed to update lecturer. Please try again.');
+//         }
+//     };
+//
+//     const handleDeleteLecturer = async (id) => {
+//         try {
+//             await deleteLecturer(id);
+//             fetchLecturers();
+//         } catch (error) {
+//             console.error('Failed to delete lecturer', error);
+//             Alert.alert('Error', 'Failed to delete lecturer. Please try again.');
+//         }
+//     };
+//
+//     return (
+//         <View style={styles.container}>
+//             <Text style={styles.title}>Lecturer Management</Text>
+//             <View style={styles.inputContainer}>
+//                 <TextInput
+//                     style={styles.input}
+//                     placeholder="First Name"
+//                     value={newLecturer.first_name}
+//                     onChangeText={(text) => setNewLecturer({...newLecturer, first_name: text})}
+//                     placeholderTextColor="gray"
+//                 />
+//                 <TextInput
+//                     style={styles.input}
+//                     placeholder="Last Name"
+//                     value={newLecturer.last_name}
+//                     onChangeText={(text) => setNewLecturer({...newLecturer, last_name: text})}
+//                     placeholderTextColor="gray"
+//                 />
+//                 <TextInput
+//                     style={styles.input}
+//                     placeholder="Staff ID"
+//                     value={newLecturer.staff_id}
+//                     onChangeText={(text) => setNewLecturer({...newLecturer, staff_id: text})}
+//                     placeholderTextColor="gray"
+//                 />
+//                 <CustomButton title="Add Lecturer" onPress={handleCreateLecturer} />
+//             </View>
+//             <FlatList
+//                 data={lecturers}
+//                 keyExtractor={(item) => item.id.toString()}
+//                 renderItem={({ item }) => (
+//                     <View style={styles.itemContainer}>
+//                         <Text style={styles.itemName}>{`${item.user.first_name} ${item.user.last_name}`}</Text>
+//                         <Text style={styles.itemDetails}>{`Staff ID: ${item.staff_id}`}</Text>
+//                         <CustomButton title="Update" onPress={() => handleUpdateLecturer(item.id, item)} />
+//                         <CustomButton title="Delete" onPress={() => handleDeleteLecturer(item.id)} />
+//                     </View>
+//                 )}
+//             />
+//         </View>
+//     );
+// }
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, Alert } from 'react-native';
-import { getLecturers, createLecturer, updateLecturer, deleteLecturer } from '../api';
+import { View, Text, FlatList, TextInput, Alert, StyleSheet } from 'react-native';
+import { getLecturers, createLecturer, updateLecturer, deleteLecturer, getModules } from '../api';
 import CustomButton from '../components/CustomButton';
+import MultiSelect from 'react-native-multiple-select';
 import styles from "../styles";
 
 export default function LecturerManagementScreen() {
     const [lecturers, setLecturers] = useState([]);
-    const [newLecturer, setNewLecturer] = useState({ first_name: '', last_name: '', staff_id: '' });
+    const [modules, setModules] = useState([]);
+    const [newLecturer, setNewLecturer] = useState({ first_name: '', last_name: '', staff_id: '', modules: [] });
 
     useEffect(() => {
         fetchLecturers();
+        fetchModules();
     }, []);
 
     const fetchLecturers = async () => {
@@ -164,10 +265,20 @@ export default function LecturerManagementScreen() {
         }
     };
 
+    const fetchModules = async () => {
+        try {
+            const response = await getModules();
+            setModules(response.data);
+        } catch (error) {
+            console.error('Failed to fetch modules', error);
+            Alert.alert('Error', 'Failed to fetch modules. Please try again.');
+        }
+    };
+
     const handleCreateLecturer = async () => {
         try {
             await createLecturer(newLecturer);
-            setNewLecturer({ first_name: '', last_name: '', staff_id: '' });
+            setNewLecturer({ first_name: '', last_name: '', staff_id: '', modules: [] });
             fetchLecturers();
         } catch (error) {
             console.error('Failed to create lecturer', error);
@@ -195,6 +306,13 @@ export default function LecturerManagementScreen() {
         }
     };
 
+    const onSelectedModulesChange = (selectedItems) => {
+        setNewLecturer(prevState => ({
+            ...prevState,
+            modules: selectedItems
+        }));
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Lecturer Management</Text>
@@ -220,6 +338,27 @@ export default function LecturerManagementScreen() {
                     onChangeText={(text) => setNewLecturer({...newLecturer, staff_id: text})}
                     placeholderTextColor="gray"
                 />
+                <Text style={styles.label}>Assign Modules:</Text>
+                <MultiSelect
+                    hideTags
+                    items={modules}
+                    uniqueKey="id"
+                    onSelectedItemsChange={onSelectedModulesChange}
+                    selectedItems={newLecturer.modules}
+                    selectText="Select Modules"
+                    searchInputPlaceholderText="Search Modules..."
+                    onChangeInput={(text) => console.log(text)}
+                    tagRemoveIconColor="#CCC"
+                    tagBorderColor="#CCC"
+                    tagTextColor="#CCC"
+                    selectedItemTextColor="#CCC"
+                    selectedItemIconColor="#CCC"
+                    itemTextColor="#000"
+                    displayKey="name"
+                    searchInputStyle={{ color: '#CCC' }}
+                    submitButtonColor="#CCC"
+                    submitButtonText="Submit"
+                />
                 <CustomButton title="Add Lecturer" onPress={handleCreateLecturer} />
             </View>
             <FlatList
@@ -229,6 +368,7 @@ export default function LecturerManagementScreen() {
                     <View style={styles.itemContainer}>
                         <Text style={styles.itemName}>{`${item.user.first_name} ${item.user.last_name}`}</Text>
                         <Text style={styles.itemDetails}>{`Staff ID: ${item.staff_id}`}</Text>
+                        <Text style={styles.itemDetails}>Modules: {item?.modules?.map(m => modules.find(mod => mod.id === m)?.name).join(', ')}</Text>
                         <CustomButton title="Update" onPress={() => handleUpdateLecturer(item.id, item)} />
                         <CustomButton title="Delete" onPress={() => handleDeleteLecturer(item.id)} />
                     </View>
@@ -237,3 +377,11 @@ export default function LecturerManagementScreen() {
         </View>
     );
 }
+
+const localStyles = StyleSheet.create({
+    label: {
+        fontSize: 16,
+        marginBottom: 5,
+        color: '#333',
+    },
+});

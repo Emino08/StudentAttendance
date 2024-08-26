@@ -12,7 +12,7 @@ export default function LoginScreen({ navigation }) {
     const handleLogin = async () => {
         const success = await login(email, password);
         if (success) {
-            console.log('Login successful, user role:', user.role);
+            // console.log('Login successful, user role:', user.role);
             // Redirect to the appropriate screen based on the user role
             if (user.role === 'admin') {
                 navigation.replace('AdminDashboard'); // Replace with admin-specific screen

@@ -41,7 +41,6 @@ function AppNavigator() {
                     <>
                         {user.role === 'admin' && (
                             <>
-
                                 <Stack.Screen name="AdminDashboard" component={AdminDashboardScreen} />
                                 <Stack.Screen name="YearManagement" component={YearManagementScreen} />
                                 <Stack.Screen name="ProgramManagement" component={ProgramManagementScreen} />
@@ -49,7 +48,7 @@ function AppNavigator() {
                                 <Stack.Screen name="ManageLecturers" component={ManageLecturersScreen} />
                                 <Stack.Screen name="ManageStudents" component={ManageStudentsScreen} />
                                 <Stack.Screen name="ViewAttendance" component={ViewAttendanceScreen} />
-
+                                <Stack.Screen name="LecturerStudentAttendanceDetailsScreen" component={LecturerStudentAttendanceDetailsScreen} />
                             </>
                         )}
                         {user.role === 'lecturer' && (

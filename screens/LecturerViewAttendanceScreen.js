@@ -1,4 +1,3 @@
-// screens/LecturerViewAttendanceScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -61,25 +60,33 @@ export default function LecturerViewAttendanceScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>View Attendance</Text>
-            <Picker
-                selectedValue={selectedProgram}
-                onValueChange={handleProgramChange}
-            >
-                <Picker.Item label="Select a program" value={null} />
-                {programs.map(program => (
-                    <Picker.Item key={program.id} label={program.name} value={program.id} />
-                ))}
-            </Picker>
-            {selectedProgram && (
+            <View style={styles.picker}>
                 <Picker
-                    selectedValue={selectedModule}
-                    onValueChange={handleModuleChange}
+                    selectedValue={selectedProgram}
+                    onValueChange={handleProgramChange}
+                    style={styles.pickerItemText}
+                    itemStyle={{ color: 'black' }}
                 >
-                    <Picker.Item label="Select a module" value={null} />
-                    {modules.map(module => (
-                        <Picker.Item key={module.id} label={module.name} value={module.id} />
+                    <Picker.Item label="Select a program" value={null} />
+                    {programs.map(program => (
+                        <Picker.Item key={program.id} label={program.name} value={program.id} />
                     ))}
                 </Picker>
+            </View>
+            {selectedProgram && (
+                <View style={styles.picker}>
+                    <Picker
+                        selectedValue={selectedModule}
+                        onValueChange={handleModuleChange}
+                        style={styles.pickerItemText}
+                        itemStyle={{ color: 'black' }}
+                    >
+                        <Picker.Item label="Select a module" value={null} />
+                        {modules.map(module => (
+                            <Picker.Item key={module.id} label={module.name} value={module.id} />
+                        ))}
+                    </Picker>
+                </View>
             )}
             {selectedModule && (
                 <FlatList

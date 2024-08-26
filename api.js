@@ -73,7 +73,6 @@ export const logout = async () => {
     return { data: { detail: 'Successfully logged out.' } };
 };
 
-
 export const deleteStudent = async (id) => {
     // Dummy delete student response
     return { data: {} };
@@ -93,22 +92,6 @@ export const updateStudent = async (id, student) => {
         }
     }
 
-export const createStudent = async (student) => {
-
-
-    // Dummy create student response
-    return {
-        data: {
-            id: 3,
-            user: { first_name: student.user.first_name, last_name: student.user.last_name },
-            student_id: student.student_id,
-            program: student.program,
-            year: student.year,
-        },
-    };
-
-
-}
 export const getYears = async () => {
     // Dummy years response
     return {
@@ -137,16 +120,6 @@ export const updateYear = async (id, year) => {
 export const deleteYear = async (id) => {
     // Dummy delete year response
     return { data: {} };
-};
-
-export const getPrograms = async () => {
-    // Dummy programs response
-    return {
-        data: [
-            { id: 1, name: 'Computer Science', description: 'Bachelor of Science in Computer Science' },
-            { id: 2, name: 'Business Administration', description: 'Bachelor of Business Administration' },
-        ],
-    };
 };
 
 export const createProgram = async (program) => {
@@ -192,54 +165,16 @@ export const getAttendance = async (student_id, year_id) => {
     };
 }
 
-export const getModules = async () => {
-    // Dummy modules response
-    return {
-        data: [
-            { id: 1, name: 'Introduction to Programming', description: 'Fundamentals of programming', program: 1, year: 1 },
-            { id: 2, name: 'Database Systems', description: 'Relational database design and management', program: 1, year: 2 },
-            { id: 3, name: 'Marketing Principles', description: 'Principles of marketing', program: 2, year: 1 },
-        ],
-    };
-};
-
-export const updateLecturer = async (id, lecturer) => {
-    // Dummy update lecturer response
-    return {
-        data: {
-            id,
-            user: { first_name: lecturer.user.first_name, last_name: lecturer.user.last_name },
-            staff_id: lecturer.staff_id,
-        },
-    };
-};
-
-
 export const deleteLecturer = async (id) => {
     // Dummy delete lecturer response
     return { data: {} };
 };
 
 
-export const createLecturer = async (lecturer) => {
-    // Dummy create lecturer response
-    return {
-        data: {
-            id: 3,
-            user: { first_name: lecturer.user.first_name, last_name: lecturer.user.last_name },
-            staff_id: lecturer.staff_id,
-        },
-    };
-};
-
-
-
 export const saveAttendance = async (attendanceData) => {
     // Dummy save attendance response
     return { data: { message: 'Attendance saved successfully.' } };
 };
-
-
 
 export const createModule = async (module) => {
     // Dummy create module response
@@ -302,11 +237,13 @@ export const getLecturers = async () => {
                 id: 1,
                 user: { first_name: 'Professor', last_name: 'Oak' },
                 staff_id: 'L001',
+                modules: [1, 2],
             },
             {
                 id: 2,
                 user: { first_name: 'Dr.', last_name: 'Elm' },
                 staff_id: 'L002',
+                modules: [3, 4],
             },
         ],
     };
@@ -341,42 +278,68 @@ export const markLecturerAttendance = async (attendanceData) => {
 
 };
 
-// New functions for lecturer management
-// export const getLecturers = async () => {
-//     return {
-//         data: [
-//             { id: 1, user: { first_name: 'John', last_name: 'Doe' }, staff_id: 'L001' },
-//             { id: 2, user: { first_name: 'Jane', last_name: 'Smith' }, staff_id: 'L002' },
-//         ],
-//     };
-// };
+export const getModules = async () => {
+    // Updated dummy modules response
+    return {
+        data: [
+            { id: 1, name: 'Introduction to Programming', description: 'Fundamentals of programming', program: 1, year: 1 },
+            { id: 2, name: 'Database Systems', description: 'Relational database design and management', program: 1, year: 2 },
+            { id: 3, name: 'Marketing Principles', description: 'Principles of marketing', program: 2, year: 1 },
+            { id: 4, name: 'Business Ethics', description: 'Ethical considerations in business', program: 2, year: 2 },
+        ],
+    };
+};
 
-// export const createLecturer = async (lecturer) => {
-//     return {
-//         data: {
-//             id: 3,
-//             user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
-//             staff_id: lecturer.staff_id,
-//         },
-//     };
-// };
+export const updateLecturer = async (id, lecturer) => {
+    // Updated dummy update lecturer response
+    return {
+        data: {
+            id,
+            user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
+            staff_id: lecturer.staff_id,
+            modules: lecturer.modules,
+        },
+    };
+};
 
-// export const updateLecturer = async (id, lecturer) => {
-//     return {
-//         data: {
-//             id,
-//             user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
-//             staff_id: lecturer.staff_id,
-//         },
-//     };
-// };
+export const createLecturer = async (lecturer) => {
+    // Updated dummy create lecturer response
+    return {
+        data: {
+            id: 3,
+            user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
+            staff_id: lecturer.staff_id,
+            modules: lecturer.modules,
+        },
+    };
+};
 
-// export const deleteLecturer = async (id) => {
-//     return { data: {} };
-// };
+export const getPrograms = async () => {
+    // Updated dummy programs response
+    return {
+        data: [
+            { id: 1, name: 'Computer Science', description: 'Bachelor of Science in Computer Science' },
+            { id: 2, name: 'Business Administration', description: 'Bachelor of Business Administration' },
+            { id: 3, name: 'Electrical Engineering', description: 'Bachelor of Science in Electrical Engineering' },
+        ],
+    };
+};
 
-// Function for profile
+export const createStudent = async (student) => {
+    // Updated dummy create student response
+    return {
+        data: {
+            id: 3,
+            user: { first_name: student.first_name, last_name: student.last_name },
+            student_id: student.student_id,
+            program: student.program,
+            year: student.year,
+        },
+    };
+};
+
 export const getProfile = async () => {
+    // Updated dummy profile response
     return {
         data: {
             id: 1,
@@ -385,11 +348,14 @@ export const getProfile = async () => {
             first_name: 'John',
             last_name: 'Doe',
             role: 'lecturer',
+            old_password: '',
+            new_password: '',
         },
     };
 };
 
 export const updateProfile = async (profile) => {
+    // Updated dummy update profile response
     return {
         data: {
             id: 1,
@@ -457,16 +423,6 @@ export const takeAttendance = async (moduleId, attendanceData) => {
         data: { message: 'Attendance saved successfully' },
     };
 };
-
-// Function to get programs (for lecturer view attendance)
-// export const getPrograms = async () => {
-//     return {
-//         data: [
-//             { id: 1, name: 'Computer Science' },
-//             { id: 2, name: 'Electrical Engineering' },
-//         ],
-//     };
-// };
 
 // Function to get modules by program (for lecturer view attendance)
 export const getModulesByProgram = async (programId) => {
