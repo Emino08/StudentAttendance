@@ -1,245 +1,5 @@
-// // screens/ManageLecturersScreen.js
-// import React, { useState, useEffect } from 'react';
-// import { View, Text, FlatList, TextInput, StyleSheet, Alert } from 'react-native';
-// import { getLecturers, createLecturer, updateLecturer, deleteLecturer } from '../api';
-// import CustomButton from '../components/CustomButton';
-// import Toast from 'react-native-toast-message';
-// import styles from "../styles";
-//
-// export default function ManageLecturersScreen() {
-//     const [lecturers, setLecturers] = useState([]);
-//     const [newLecturerName, setNewLecturerName] = useState('');
-//     const [newLecturerEmail, setNewLecturerEmail] = useState('');
-//
-//     useEffect(() => {
-//         fetchLecturers();
-//     }, []);
-//
-//     const fetchLecturers = async () => {
-//         try {
-//             const response = await getLecturers();
-//             setLecturers(response.data);
-//         } catch (error) {
-//             console.error('Failed to fetch lecturers', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to fetch lecturers. Please try again.'
-//             });
-//         }
-//     };
-//
-//     const handleCreateLecturer = async () => {
-//         try {
-//             await createLecturer({ name: newLecturerName, email: newLecturerEmail });
-//             setNewLecturerName('');
-//             setNewLecturerEmail('');
-//             fetchLecturers();
-//             Toast.show({
-//                 type: 'success',
-//                 text1: 'Success',
-//                 text2: 'Lecturer created successfully.'
-//             });
-//         } catch (error) {
-//             console.error('Failed to create lecturer', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to create lecturer. Please try again.'
-//             });
-//         }
-//     };
-//
-//     const handleUpdateLecturer = async (id, updatedLecturer) => {
-//         try {
-//             await updateLecturer(id, updatedLecturer);
-//             fetchLecturers();
-//             Toast.show({
-//                 type: 'success',
-//                 text1: 'Success',
-//                 text2: 'Lecturer updated successfully.'
-//             });
-//         } catch (error) {
-//             console.error('Failed to update lecturer', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to update lecturer. Please try again.'
-//             });
-//         }
-//     };
-//
-//     const handleDeleteLecturer = async (id) => {
-//         try {
-//             await deleteLecturer(id);
-//             fetchLecturers();
-//             Toast.show({
-//                 type: 'success',
-//                 text1: 'Success',
-//                 text2: 'Lecturer deleted successfully.'
-//             });
-//         } catch (error) {
-//             console.error('Failed to delete lecturer', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to delete lecturer. Please try again.'
-//             });
-//         }
-//     };
-//
-//     return (
-//         <View style={[styles.container, localStyles.centeredContainer]}>
-//             <Text style={styles.title}>Manage Lecturers</Text>
-//             <View style={styles.inputContainer}>
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Lecturer Name"
-//                     value={newLecturerName}
-//                     onChangeText={setNewLecturerName}
-//                     placeholderTextColor="gray"
-//                 />
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Lecturer Email"
-//                     value={newLecturerEmail}
-//                     onChangeText={setNewLecturerEmail}
-//                     placeholderTextColor="gray"
-//                     keyboardType="email-address"
-//                 />
-//                 <CustomButton title="Add Lecturer" onPress={handleCreateLecturer} />
-//             </View>
-//             <FlatList
-//                 data={lecturers}
-//                 keyExtractor={(item) => item.id.toString()}
-//                 renderItem={({ item }) => (
-//                     <View style={styles.itemContainer}>
-//                         <Text style={styles.itemName}>{item.name}</Text>
-//                         <Text style={styles.itemEmail}>{item.email}</Text>
-//                         <CustomButton title="Edit" onPress={() => {
-//                             // Implement edit functionality
-//                             Alert.alert('Edit', 'Edit functionality to be implemented');
-//                         }} />
-//                         <CustomButton title="Delete" onPress={() => handleDeleteLecturer(item.id)} />
-//                     </View>
-//                 )}
-//             />
-//         </View>
-//     );
-// }
-//
-// const localStyles = StyleSheet.create({
-//     centeredContainer: {
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//     },
-//     itemEmail: {
-//         fontSize: 14,
-//         color: 'gray',
-//     },
-// });
-
-// screens/LecturerManagementScreen.js
-// import React, { useState, useEffect } from 'react';
-// import { View, Text, FlatList, TextInput, Alert } from 'react-native';
-// import { getLecturers, createLecturer, updateLecturer, deleteLecturer } from '../api';
-// import CustomButton from '../components/CustomButton';
-// import styles from "../styles";
-//
-// export default function LecturerManagementScreen() {
-//     const [lecturers, setLecturers] = useState([]);
-//     const [newLecturer, setNewLecturer] = useState({ first_name: '', last_name: '', staff_id: '' });
-//
-//     useEffect(() => {
-//         fetchLecturers();
-//     }, []);
-//
-//     const fetchLecturers = async () => {
-//         try {
-//             const response = await getLecturers();
-//             setLecturers(response.data);
-//         } catch (error) {
-//             console.error('Failed to fetch lecturers', error);
-//             Alert.alert('Error', 'Failed to fetch lecturers. Please try again.');
-//         }
-//     };
-//
-//     const handleCreateLecturer = async () => {
-//         try {
-//             await createLecturer(newLecturer);
-//             setNewLecturer({ first_name: '', last_name: '', staff_id: '' });
-//             fetchLecturers();
-//         } catch (error) {
-//             console.error('Failed to create lecturer', error);
-//             Alert.alert('Error', 'Failed to create lecturer. Please try again.');
-//         }
-//     };
-//
-//     const handleUpdateLecturer = async (id, updatedLecturer) => {
-//         try {
-//             await updateLecturer(id, updatedLecturer);
-//             fetchLecturers();
-//         } catch (error) {
-//             console.error('Failed to update lecturer', error);
-//             Alert.alert('Error', 'Failed to update lecturer. Please try again.');
-//         }
-//     };
-//
-//     const handleDeleteLecturer = async (id) => {
-//         try {
-//             await deleteLecturer(id);
-//             fetchLecturers();
-//         } catch (error) {
-//             console.error('Failed to delete lecturer', error);
-//             Alert.alert('Error', 'Failed to delete lecturer. Please try again.');
-//         }
-//     };
-//
-//     return (
-//         <View style={styles.container}>
-//             <Text style={styles.title}>Lecturer Management</Text>
-//             <View style={styles.inputContainer}>
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="First Name"
-//                     value={newLecturer.first_name}
-//                     onChangeText={(text) => setNewLecturer({...newLecturer, first_name: text})}
-//                     placeholderTextColor="gray"
-//                 />
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Last Name"
-//                     value={newLecturer.last_name}
-//                     onChangeText={(text) => setNewLecturer({...newLecturer, last_name: text})}
-//                     placeholderTextColor="gray"
-//                 />
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Staff ID"
-//                     value={newLecturer.staff_id}
-//                     onChangeText={(text) => setNewLecturer({...newLecturer, staff_id: text})}
-//                     placeholderTextColor="gray"
-//                 />
-//                 <CustomButton title="Add Lecturer" onPress={handleCreateLecturer} />
-//             </View>
-//             <FlatList
-//                 data={lecturers}
-//                 keyExtractor={(item) => item.id.toString()}
-//                 renderItem={({ item }) => (
-//                     <View style={styles.itemContainer}>
-//                         <Text style={styles.itemName}>{`${item.user.first_name} ${item.user.last_name}`}</Text>
-//                         <Text style={styles.itemDetails}>{`Staff ID: ${item.staff_id}`}</Text>
-//                         <CustomButton title="Update" onPress={() => handleUpdateLecturer(item.id, item)} />
-//                         <CustomButton title="Delete" onPress={() => handleDeleteLecturer(item.id)} />
-//                     </View>
-//                 )}
-//             />
-//         </View>
-//     );
-// }
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TextInput, Alert, StyleSheet, Modal, Dimensions } from 'react-native';
 import { getLecturers, createLecturer, updateLecturer, deleteLecturer, getModules } from '../api';
 import CustomButton from '../components/CustomButton';
 import MultiSelect from 'react-native-multiple-select';
@@ -249,6 +9,8 @@ export default function LecturerManagementScreen() {
     const [lecturers, setLecturers] = useState([]);
     const [modules, setModules] = useState([]);
     const [newLecturer, setNewLecturer] = useState({ first_name: '', last_name: '', staff_id: '', modules: [] });
+    const [modalVisible, setModalVisible] = useState(false);
+    const [editingLecturer, setEditingLecturer] = useState(null);
 
     useEffect(() => {
         fetchLecturers();
@@ -280,16 +42,19 @@ export default function LecturerManagementScreen() {
             await createLecturer(newLecturer);
             setNewLecturer({ first_name: '', last_name: '', staff_id: '', modules: [] });
             fetchLecturers();
+            Alert.alert('Success', 'Lecturer created successfully.');
         } catch (error) {
             console.error('Failed to create lecturer', error);
             Alert.alert('Error', 'Failed to create lecturer. Please try again.');
         }
     };
 
-    const handleUpdateLecturer = async (id, updatedLecturer) => {
+    const handleUpdateLecturer = async () => {
         try {
-            await updateLecturer(id, updatedLecturer);
+            await updateLecturer(editingLecturer.id, editingLecturer);
+            setModalVisible(false);
             fetchLecturers();
+            Alert.alert('Success', 'Lecturer updated successfully.');
         } catch (error) {
             console.error('Failed to update lecturer', error);
             Alert.alert('Error', 'Failed to update lecturer. Please try again.');
@@ -300,14 +65,27 @@ export default function LecturerManagementScreen() {
         try {
             await deleteLecturer(id);
             fetchLecturers();
+            Alert.alert('Success', 'Lecturer deleted successfully.');
         } catch (error) {
             console.error('Failed to delete lecturer', error);
             Alert.alert('Error', 'Failed to delete lecturer. Please try again.');
         }
     };
 
+    const openEditModal = (lecturer) => {
+        setEditingLecturer(lecturer);
+        setModalVisible(true);
+    };
+
     const onSelectedModulesChange = (selectedItems) => {
         setNewLecturer(prevState => ({
+            ...prevState,
+            modules: selectedItems
+        }));
+    };
+
+    const onEditSelectedModulesChange = (selectedItems) => {
+        setEditingLecturer(prevState => ({
             ...prevState,
             modules: selectedItems
         }));
@@ -368,20 +146,117 @@ export default function LecturerManagementScreen() {
                     <View style={styles.itemContainer}>
                         <Text style={styles.itemName}>{`${item.user.first_name} ${item.user.last_name}`}</Text>
                         <Text style={styles.itemDetails}>{`Staff ID: ${item.staff_id}`}</Text>
-                        <Text style={styles.itemDetails}>Modules: {item?.modules?.map(m => modules.find(mod => mod.id === m)?.name).join(', ')}</Text>
-                        <CustomButton title="Update" onPress={() => handleUpdateLecturer(item.id, item)} />
+                        <Text style={styles.itemDetails}>Modules: {item.modules.map(m => modules.find(mod => mod.id === m)?.name).join(', ')}</Text>
+                        <CustomButton title="Edit" onPress={() => openEditModal(item)} />
                         <CustomButton title="Delete" onPress={() => handleDeleteLecturer(item.id)} />
                     </View>
                 )}
             />
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Edit Lecturer</Text>
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="First Name"
+                            value={editingLecturer ? editingLecturer.user.first_name : ''}
+                            onChangeText={(text) => setEditingLecturer({
+                                ...editingLecturer,
+                                user: {...editingLecturer.user, first_name: text}
+                            })}
+                            placeholderTextColor="gray"
+                        />
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="Last Name"
+                            value={editingLecturer ? editingLecturer.user.last_name : ''}
+                            onChangeText={(text) => setEditingLecturer({
+                                ...editingLecturer,
+                                user: {...editingLecturer.user, last_name: text}
+                            })}
+                            placeholderTextColor="gray"
+                        />
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="Staff ID"
+                            value={editingLecturer ? editingLecturer.staff_id : ''}
+                            onChangeText={(text) => setEditingLecturer({...editingLecturer, staff_id: text})}
+                            placeholderTextColor="gray"
+                        />
+                        <Text style={styles.label}>Assign Modules:</Text>
+                        <MultiSelect
+                            hideTags
+                            items={modules}
+                            uniqueKey="id"
+                            onSelectedItemsChange={onEditSelectedModulesChange}
+                            selectedItems={editingLecturer ? editingLecturer.modules : []}
+                            selectText="Select Modules"
+                            searchInputPlaceholderText="Search Modules..."
+                            onChangeInput={(text) => console.log(text)}
+                            tagRemoveIconColor="#CCC"
+                            tagBorderColor="#CCC"
+                            tagTextColor="#CCC"
+                            selectedItemTextColor="#CCC"
+                            selectedItemIconColor="#CCC"
+                            itemTextColor="#000"
+                            displayKey="name"
+                            searchInputStyle={{ color: '#CCC' }}
+                            submitButtonColor="#CCC"
+                            submitButtonText="Submit"
+                        />
+                        <CustomButton title="Update" onPress={handleUpdateLecturer} />
+                        <CustomButton title="Cancel" onPress={() => setModalVisible(false)} />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
 
-const localStyles = StyleSheet.create({
-    label: {
-        fontSize: 16,
-        marginBottom: 5,
-        color: '#333',
+const { width } = Dimensions.get('window');
+
+const modalStyles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalView: {
+        width: width * 0.9,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        fontSize: 18,
+        fontWeight: "bold"
+    },
+    modalInput: {
+        width: '100%',
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 20,
     },
 });
+
+Object.assign(styles, modalStyles);

@@ -1,435 +1,221 @@
-// // api.js
-// import axios from 'axios';
-//
-// const API_URL = 'http://your-api-url.com/api/';
-//
-// const api = axios.create({
-//     baseURL: API_URL,
-// });
-//
-// export const setAuthToken = (token) => {
-//     if (token) {
-//         api.defaults.headers.common['Authorization'] = `Token ${token}`;
-//     } else {
-//         delete api.defaults.headers.common['Authorization'];
-//     }
-// };
-//
-// export const login = (username, password) => api.post('login/', { username, password });
-// export const logout = () => api.post('logout/');
-//
-// export const getYears = () => api.get('years/');
-// export const createYear = (year) => api.post('years/', year);
-// export const updateYear = (id, year) => api.put(`years/${id}/`, year);
-// export const deleteYear = (id) => api.delete(`years/${id}/`);
-//
-// export const getPrograms = () => api.get('programs/');
-// export const createProgram = (program) => api.post('programs/', program);
-// export const updateProgram = (id, program) => api.put(`programs/${id}/`, program);
-// export const deleteProgram = (id) => api.delete(`programs/${id}/`);
-//
-// export const getModules = () => api.get('modules/');
-// export const createModule = (module) => api.post('modules/', module);
-// export const updateModule = (id, module) => api.put(`modules/${id}/`, module);
-// export const deleteModule = (id) => api.delete(`modules/${id}/`);
-//
-// export const getStudents = () => api.get('students/');
-// export const getLecturers = () => api.get('lecturers/');
-//
-// export const markStudentAttendance = (attendanceData) => api.post('student-attendance/mark_attendance/', attendanceData);
-// export const markLecturerAttendance = (attendanceData) => api.post('lecturer-attendance/mark_attendance/', attendanceData);
-
-// api.js
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://your-api-url.com/api/';
+const API_URL = 'http://192.168.199.61:8000/api/';
 
 const api = axios.create({
     baseURL: API_URL,
+    adapter: 'fetch',
 });
 
-export const setAuthToken = (token) => {
-    if (token) {
-        api.defaults.headers.common['Authorization'] = `Token ${token}`;
+export const setAuthToken = async () => {
+    const userString = await AsyncStorage.getItem('user');
+    if (userString) {
+        const user = JSON.parse(userString);
+        console.log("Setting auth token: ", user.token);
+        api.defaults.headers.common['Authorization'] = `Token ${user.token}`;
     } else {
         delete api.defaults.headers.common['Authorization'];
     }
 };
 
+// Call setAuthToken on app start and after login/logout
+setAuthToken();
+
+const getAuthHeader = async () => {
+    const userString = await AsyncStorage.getItem('user');
+    if (userString) {
+        const user = JSON.parse(userString);
+        return { 'Authorization': `Token ${user.token}` };
+    }
+    return {};
+};
+
 export const login = async (username, password) => {
-    // Dummy login response
-    return {
-        data: {
-            token: 'dummy_token',
-            user_id: 1,
-            email: 'user@example.com',
-            role: 'admin',
-        },
+    const response = await api.post('login/', { username, password });
+    const { token, user: userData } = response.data;
+
+    const userDetailsResponse = await api.get(`users/${userData.id}/`, {
+        headers: { 'Authorization': `Token ${token}` }
+    });
+    const userDetails = userDetailsResponse.data;
+
+    const completeUserData = {
+        ...userData,
+        ...userDetails,
+        token
     };
+
+    await AsyncStorage.setItem('user', JSON.stringify(completeUserData));
+    await setAuthToken();
+
+    return {
+        success: true,
+        requiresPasswordChange: !completeUserData.is_password_changed,
+        user: completeUserData
+    };
+};
+
+export const changePassword = async (newPassword) => {
+    const headers = await getAuthHeader();
+    const response = await api.post('change-password/', { new_password: newPassword }, { headers });
+    const userString = await AsyncStorage.getItem('user');
+    if (userString) {
+        const user = JSON.parse(userString);
+        const updatedUser = { ...user, is_password_changed: true };
+        await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
 };
 
 export const logout = async () => {
-    // Dummy logout response
-    return { data: { detail: 'Successfully logged out.' } };
+    await AsyncStorage.removeItem('user');
+    delete api.defaults.headers.common['Authorization'];
 };
 
-export const deleteStudent = async (id) => {
-    // Dummy delete student response
-    return { data: {} };
+export const getUsers = async () => {
+    const headers = await getAuthHeader();
+    return api.get('users/', { headers });
+};
 
-}
+export const createUser = async (userData) => {
+    const headers = await getAuthHeader();
+    return api.post('users/', userData, { headers });
+};
 
-export const updateStudent = async (id, student) => {
-    // Dummy update student response
-    return {
-        data: {
-            id,
-            user: { first_name: student.user.first_name, last_name: student.user.last_name },
-            student_id: student.student_id,
-            program: student.program,
-            year: student.year,
-        },
-        }
-    }
+export const updateUser = async (id, userData) => {
+    const headers = await getAuthHeader();
+    return api.put(`users/${id}/`, userData, { headers });
+};
+
+export const deleteUser = async (id) => {
+    const headers = await getAuthHeader();
+    return api.delete(`users/${id}/`, { headers });
+};
+
+export const getUserRoles = async () => {
+    const headers = await getAuthHeader();
+    return api.get('user-roles/', { headers });
+};
 
 export const getYears = async () => {
-    // Dummy years response
-    return {
-        data: [
-            { id: 1, year: 2022, is_current: true },
-            { id: 2, year: 2023, is_current: false },
-            { id: 3, year: 2024, is_current: false },
-        ],
-    };
+    const headers = await getAuthHeader();
+    return api.get('years/', { headers });
 };
 
-export const createYear = async (year) => {
-    // Dummy create year response
-    return {
-        data: { id: 4, year: year.year, is_current: year.is_current },
-    };
+export const createYear = async (yearData) => {
+    const headers = await getAuthHeader();
+    return api.post('years/', yearData, { headers });
 };
 
-export const updateYear = async (id, year) => {
-    // Dummy update year response
-    return {
-        data: { id, year: year.year, is_current: year.is_current },
-    };
+export const updateYear = async (id, yearData) => {
+    const headers = await getAuthHeader();
+    return api.put(`years/${id}/`, yearData, { headers });
 };
 
 export const deleteYear = async (id) => {
-    // Dummy delete year response
-    return { data: {} };
-};
-
-export const createProgram = async (program) => {
-    // Dummy create program response
-    return {
-        data: { id: 3, name: program.name, description: program.description },
-    };
-};
-
-export const updateProgram = async (id, program) => {
-    // Dummy update program response
-    return {
-        data: { id, name: program.name, description: program.description },
-    };
-};
-
-export const deleteProgram = async (id) => {
-    // Dummy delete program response
-    return { data: {} };
-};
-
-export const getAttendance = async (student_id, year_id) => {
-    // Dummy attendance response
-    return {
-        data: [
-            {
-                id: 1,
-                student: student_id,
-                module: 1,
-                year: year_id,
-                date: '2023-01-01',
-                status: 'present',
-            },
-            {
-                id: 2,
-                student: student_id,
-                module: 2,
-                year: year_id,
-                date: '2023-01-02',
-                status: 'absent',
-            },
-        ],
-    };
-}
-
-export const deleteLecturer = async (id) => {
-    // Dummy delete lecturer response
-    return { data: {} };
-};
-
-
-export const saveAttendance = async (attendanceData) => {
-    // Dummy save attendance response
-    return { data: { message: 'Attendance saved successfully.' } };
-};
-
-export const createModule = async (module) => {
-    // Dummy create module response
-    return {
-        data: {
-            id: 4,
-            name: module.name,
-            description: module.description,
-            program: module.program,
-            year: module.year,
-        },
-    };
-};
-
-export const updateModule = async (id, module) => {
-    // Dummy update module response
-    return {
-        data: {
-            id,
-            name: module.name,
-            description: module.description,
-            program: module.program,
-            year: module.year,
-        },
-    };
-};
-
-export const deleteModule = async (id) => {
-    // Dummy delete module response
-    return { data: {} };
-};
-
-export const getStudents = async () => {
-    // Dummy students response
-    return {
-        data: [
-            {
-                id: 1,
-                user: { first_name: 'John', last_name: 'Doe' },
-                student_id: 'S001',
-                program: 1,
-                year: 2,
-            },
-            {
-                id: 2,
-                user: { first_name: 'Jane', last_name: 'Smith' },
-                student_id: 'S002',
-                program: 1,
-                year: 1,
-            },
-        ],
-    };
-};
-
-export const getLecturers = async () => {
-    // Dummy lecturers response
-    return {
-        data: [
-            {
-                id: 1,
-                user: { first_name: 'Professor', last_name: 'Oak' },
-                staff_id: 'L001',
-                modules: [1, 2],
-            },
-            {
-                id: 2,
-                user: { first_name: 'Dr.', last_name: 'Elm' },
-                staff_id: 'L002',
-                modules: [3, 4],
-            },
-        ],
-    };
-};
-
-export const markStudentAttendance = async (attendanceData) => {
-    // Dummy mark student attendance response
-    return {
-        data: {
-            id: 1,
-            student: attendanceData.student,
-            module: attendanceData.module,
-            year: attendanceData.year,
-            date: attendanceData.date,
-            status: attendanceData.status,
-        },
-    };
-};
-
-export const markLecturerAttendance = async (attendanceData) => {
-    // Dummy mark lecturer attendance response
-    return {
-        data: {
-            id: 1,
-            lecturer: attendanceData.lecturer,
-            module: attendanceData.module,
-            year: attendanceData.year,
-            date: attendanceData.date,
-            status: attendanceData.status,
-        },
-    };
-
-};
-
-export const getModules = async () => {
-    // Updated dummy modules response
-    return {
-        data: [
-            { id: 1, name: 'Introduction to Programming', description: 'Fundamentals of programming', program: 1, year: 1 },
-            { id: 2, name: 'Database Systems', description: 'Relational database design and management', program: 1, year: 2 },
-            { id: 3, name: 'Marketing Principles', description: 'Principles of marketing', program: 2, year: 1 },
-            { id: 4, name: 'Business Ethics', description: 'Ethical considerations in business', program: 2, year: 2 },
-        ],
-    };
-};
-
-export const updateLecturer = async (id, lecturer) => {
-    // Updated dummy update lecturer response
-    return {
-        data: {
-            id,
-            user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
-            staff_id: lecturer.staff_id,
-            modules: lecturer.modules,
-        },
-    };
-};
-
-export const createLecturer = async (lecturer) => {
-    // Updated dummy create lecturer response
-    return {
-        data: {
-            id: 3,
-            user: { first_name: lecturer.first_name, last_name: lecturer.last_name },
-            staff_id: lecturer.staff_id,
-            modules: lecturer.modules,
-        },
-    };
+    const headers = await getAuthHeader();
+    return api.delete(`years/${id}/`, { headers });
 };
 
 export const getPrograms = async () => {
-    // Updated dummy programs response
-    return {
-        data: [
-            { id: 1, name: 'Computer Science', description: 'Bachelor of Science in Computer Science' },
-            { id: 2, name: 'Business Administration', description: 'Bachelor of Business Administration' },
-            { id: 3, name: 'Electrical Engineering', description: 'Bachelor of Science in Electrical Engineering' },
-        ],
-    };
+    const headers = await getAuthHeader();
+    return api.get('programs/', { headers });
 };
 
-export const createStudent = async (student) => {
-    // Updated dummy create student response
-    return {
-        data: {
-            id: 3,
-            user: { first_name: student.first_name, last_name: student.last_name },
-            student_id: student.student_id,
-            program: student.program,
-            year: student.year,
-        },
-    };
+export const createProgram = async (programData) => {
+    const headers = await getAuthHeader();
+    return api.post('programs/', programData, { headers });
 };
 
-export const getProfile = async () => {
-    // Updated dummy profile response
-    return {
-        data: {
-            id: 1,
-            username: 'johndoe',
-            email: 'johndoe@example.com',
-            first_name: 'John',
-            last_name: 'Doe',
-            role: 'lecturer',
-            old_password: '',
-            new_password: '',
-        },
-    };
+export const updateProgram = async (id, programData) => {
+    const headers = await getAuthHeader();
+    return api.put(`programs/${id}/`, programData, { headers });
 };
 
-export const updateProfile = async (profile) => {
-    // Updated dummy update profile response
-    return {
-        data: {
-            id: 1,
-            username: profile.username,
-            email: profile.email,
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            role: 'lecturer',
-        },
-    };
+export const deleteProgram = async (id) => {
+    const headers = await getAuthHeader();
+    return api.delete(`programs/${id}/`, { headers });
 };
 
-// Functions for student attendance view
-export const getStudentAttendance = async (studentId) => {
-    return {
-        data: [
-            { id: 1, module: 'Mathematics', present: 10, absent: 2 },
-            { id: 2, module: 'Physics', present: 8, absent: 4 },
-        ],
-    };
+export const getModules = async () => {
+    const headers = await getAuthHeader();
+    return api.get('modules/', { headers });
 };
 
-export const getStudentAttendanceDetails = async (studentId, moduleId) => {
-    return {
-        data: [
-            { id: 1, date: '2023-08-01', status: 'present' },
-            { id: 2, date: '2023-08-02', status: 'absent' },
-            { id: 3, date: '2023-08-03', status: 'present' },
-        ],
-    };
+export const createModule = async (moduleData) => {
+    const headers = await getAuthHeader();
+    return api.post('modules/', moduleData, { headers });
 };
 
-// Functions for lecturer attendance view
-export const getLecturerModules = async (lecturerId) => {
-    return {
-        data: [
-            { id: 1, name: 'Mathematics' },
-            { id: 2, name: 'Physics' },
-        ],
-    };
+export const updateModule = async (id, moduleData) => {
+    const headers = await getAuthHeader();
+    return api.put(`modules/${id}/`, moduleData, { headers });
 };
 
-export const getLecturerAttendance = async (lecturerId, moduleId) => {
-    return {
-        data: [
-            { id: 1, student: 'Alice Johnson', present: 10, absent: 2 },
-            { id: 2, student: 'Bob Smith', present: 8, absent: 4 },
-        ],
-    };
+export const deleteModule = async (id) => {
+    const headers = await getAuthHeader();
+    return api.delete(`modules/${id}/`, { headers });
 };
 
-export const getLecturerAttendanceDetails = async (lecturerId, moduleId, studentId) => {
-    return {
-        data: [
-            { id: 1, date: '2023-08-01', status: 'present' },
-            { id: 2, date: '2023-08-02', status: 'absent' },
-            { id: 3, date: '2023-08-03', status: 'present' },
-        ],
-    };
+export const getStudents = async () => {
+    const headers = await getAuthHeader();
+    return api.get('students/', { headers });
 };
 
-// Function for lecturer to take attendance
-export const takeAttendance = async (moduleId, attendanceData) => {
-    return {
-        data: { message: 'Attendance saved successfully' },
-    };
+export const createStudent = async (studentData) => {
+    const headers = await getAuthHeader();
+    return api.post('students/', studentData, { headers });
 };
 
-// Function to get modules by program (for lecturer view attendance)
-export const getModulesByProgram = async (programId) => {
-    return {
-        data: [
-            { id: 1, name: 'Introduction to Programming' },
-            { id: 2, name: 'Data Structures' },
-        ],
-    };
+export const updateStudent = async (id, studentData) => {
+    const headers = await getAuthHeader();
+    return api.put(`students/${id}/`, studentData, { headers });
 };
+
+export const deleteStudent = async (id) => {
+    const headers = await getAuthHeader();
+    return api.delete(`students/${id}/`, { headers });
+};
+
+export const getLecturers = async () => {
+    const headers = await getAuthHeader();
+    return api.get('lecturers/', { headers });
+};
+
+export const createLecturer = async (lecturerData) => {
+    const headers = await getAuthHeader();
+    return api.post('lecturers/', lecturerData, { headers });
+};
+
+export const updateLecturer = async (id, lecturerData) => {
+    const headers = await getAuthHeader();
+    return api.put(`lecturers/${id}/`, lecturerData, { headers });
+};
+
+export const deleteLecturer = async (id) => {
+    const headers = await getAuthHeader();
+    return api.delete(`lecturers/${id}/`, { headers });
+};
+
+export const getStudentAttendance = async () => {
+    const headers = await getAuthHeader();
+    return api.get('student-attendance/', { headers });
+};
+
+export const markStudentAttendance = async (attendanceData) => {
+    const headers = await getAuthHeader();
+    return api.post('student-attendance/', attendanceData, { headers });
+};
+
+export const getLecturerAttendance = async () => {
+    const headers = await getAuthHeader();
+    return api.get('lecturer-attendance/', { headers });
+};
+
+export const markLecturerAttendance = async (attendanceData) => {
+    const headers = await getAuthHeader();
+    return api.post('lecturer-attendance/', attendanceData, { headers });
+};
+
+export default api;

@@ -23,7 +23,8 @@ import LecturerStudentAttendanceDetailsScreen from "./screens/LecturerStudentAtt
 import LecturerModuleAttendanceScreen from "./screens/LectuterModuleAttendanceScreen"; // Add this component
 import LecturerTakeAttendanceScreen from "./screens/LecturerTakeAttendanceScreen";
 import StudentAttendanceScreen from "./screens/StudentAttendance";
-import StudentAttendanceDetailsScreen from "./screens/StudentAttendanceDetailsScreen"; // Add this component
+import StudentAttendanceDetailsScreen from "./screens/StudentAttendanceDetailsScreen";
+import ChangePasswordScreen from "./screens/ChangePasswordScreen"; // Add this component
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,8 @@ function AppNavigator() {
         <NavigationContainer>
             <Stack.Navigator>
                 {user ? (
+                    user.is_password_changed ? (
+                    // true ? (
                     <>
                         {user.role === 'admin' && (
                             <>
@@ -50,6 +53,7 @@ function AppNavigator() {
                                 <Stack.Screen name="ViewAttendance" component={ViewAttendanceScreen} />
                                 <Stack.Screen name="LecturerStudentAttendanceDetailsScreen" component={LecturerStudentAttendanceDetailsScreen} />
                             </>
+
                         )}
                         {user.role === 'lecturer' && (
                             <>
@@ -75,6 +79,9 @@ function AppNavigator() {
                         )}
                         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
                     </>
+                    ) : (
+                        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+                    )
                 ) : (
                     <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
                 )}

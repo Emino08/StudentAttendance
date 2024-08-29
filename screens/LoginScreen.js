@@ -11,21 +11,21 @@ export default function LoginScreen({ navigation }) {
 
     const handleLogin = async () => {
         const success = await login(email, password);
-        if (success) {
-            // console.log('Login successful, user role:', user.role);
-            // Redirect to the appropriate screen based on the user role
-            if (user.role === 'admin') {
-                navigation.replace('AdminDashboard'); // Replace with admin-specific screen
-            } else if (user.role === 'lecturer') {
-                navigation.replace('LecturerDashboard'); // Replace with lecturer-specific screen
-            } else if (user.role === 'student') {
-                navigation.replace('StudentDashboard'); // Replace with student-specific screen
-            } else {
-                Alert.alert('Login Failed', 'User role not recognized.');
-            }
-        } else {
-            Alert.alert('Login Failed', 'Please check your credentials and try again.');
-        }
+        // if (success) {
+        //     // console.log('Login successful, user role:', user.role);
+        //     // Redirect to the appropriate screen based on the user role
+        //     if (user.role === 'admin') {
+        //         navigation.replace('AdminDashboard'); // Replace with admin-specific screen
+        //     } else if (user.role === 'lecturer') {
+        //         navigation.replace('LecturerDashboard'); // Replace with lecturer-specific screen
+        //     } else if (user.role === 'student') {
+        //         navigation.replace('StudentDashboard'); // Replace with student-specific screen
+        //     } else {
+        //         Alert.alert('Login Failed', 'User role not recognized.');
+        //     }
+        // } else {
+        //     Alert.alert('Login Failed', 'Please check your credentials and try again.');
+        // }
     };
 
     return (

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TextInput, StyleSheet, Modal, Alert, Dimensions } from 'react-native';
 import { getStudents, createStudent, updateStudent, deleteStudent, getPrograms } from '../api';
 import CustomButton from '../components/CustomButton';
 import { Picker } from '@react-native-picker/picker';
-import Toast from 'react-native-toast-message';
 import styles from "../styles";
 
 export default function ManageStudentsScreen() {
     const [students, setStudents] = useState([]);
     const [programs, setPrograms] = useState([]);
     const [newStudent, setNewStudent] = useState({ first_name: '', last_name: '', student_id: '', program: '' });
+    const [modalVisible, setModalVisible] = useState(false);
+    const [editingStudent, setEditingStudent] = useState(null);
 
     useEffect(() => {
         fetchStudents();
@@ -22,11 +23,7 @@ export default function ManageStudentsScreen() {
             setStudents(response.data);
         } catch (error) {
             console.error('Failed to fetch students', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to fetch students. Please try again.'
-            });
+            Alert.alert('Error', 'Failed to fetch students. Please try again.');
         }
     };
 
@@ -36,11 +33,7 @@ export default function ManageStudentsScreen() {
             setPrograms(response.data);
         } catch (error) {
             console.error('Failed to fetch programs', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to fetch programs. Please try again.'
-            });
+            Alert.alert('Error', 'Failed to fetch programs. Please try again.');
         }
     };
 
@@ -49,37 +42,22 @@ export default function ManageStudentsScreen() {
             await createStudent(newStudent);
             setNewStudent({ first_name: '', last_name: '', student_id: '', program: '' });
             fetchStudents();
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Student created successfully.'
-            });
+            Alert.alert('Success', 'Student created successfully.');
         } catch (error) {
             console.error('Failed to create student', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to create student. Please try again.'
-            });
+            Alert.alert('Error', 'Failed to create student. Please try again.');
         }
     };
 
-    const handleUpdateStudent = async (id, updatedStudent) => {
+    const handleUpdateStudent = async () => {
         try {
-            await updateStudent(id, updatedStudent);
+            await updateStudent(editingStudent.id, editingStudent);
+            setModalVisible(false);
             fetchStudents();
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Student updated successfully.'
-            });
+            Alert.alert('Success', 'Student updated successfully.');
         } catch (error) {
             console.error('Failed to update student', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to update student. Please try again.'
-            });
+            Alert.alert('Error', 'Failed to update student. Please try again.');
         }
     };
 
@@ -87,19 +65,16 @@ export default function ManageStudentsScreen() {
         try {
             await deleteStudent(id);
             fetchStudents();
-            Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Student deleted successfully.'
-            });
+            Alert.alert('Success', 'Student deleted successfully.');
         } catch (error) {
             console.error('Failed to delete student', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Failed to delete student. Please try again.'
-            });
+            Alert.alert('Error', 'Failed to delete student. Please try again.');
         }
+    };
+
+    const openEditModal = (student) => {
+        setEditingStudent(student);
+        setModalVisible(true);
     };
 
     return (
@@ -147,173 +122,109 @@ export default function ManageStudentsScreen() {
                         <Text style={styles.itemName}>{`${item.user.first_name} ${item.user.last_name}`}</Text>
                         <Text style={styles.itemDetails}>{`Student ID: ${item.student_id}`}</Text>
                         <Text style={styles.itemDetails}>{`Program: ${programs.find(p => p.id === item.program)?.name}`}</Text>
-                        <CustomButton title="Edit" onPress={() => handleUpdateStudent(item.id, item)} />
+                        <CustomButton title="Edit" onPress={() => openEditModal(item)} />
                         <CustomButton title="Delete" onPress={() => handleDeleteStudent(item.id)} />
                     </View>
                 )}
             />
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Edit Student</Text>
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="First Name"
+                            value={editingStudent ? editingStudent.user.first_name : ''}
+                            onChangeText={(text) => setEditingStudent({
+                                ...editingStudent,
+                                user: {...editingStudent.user, first_name: text}
+                            })}
+                            placeholderTextColor="gray"
+                        />
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="Last Name"
+                            value={editingStudent ? editingStudent.user.last_name : ''}
+                            onChangeText={(text) => setEditingStudent({
+                                ...editingStudent,
+                                user: {...editingStudent.user, last_name: text}
+                            })}
+                            placeholderTextColor="gray"
+                        />
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="Student ID"
+                            value={editingStudent ? editingStudent.student_id : ''}
+                            onChangeText={(text) => setEditingStudent({...editingStudent, student_id: text})}
+                            placeholderTextColor="gray"
+                        />
+                        <Picker
+                            selectedValue={editingStudent ? editingStudent.program : ''}
+                            style={styles.modalPicker}
+                            onValueChange={(itemValue) => setEditingStudent({...editingStudent, program: itemValue})}
+                        >
+                            <Picker.Item label="Select Program" value="" />
+                            {programs.map((program) => (
+                                <Picker.Item key={program.id} label={program.name} value={program.id} />
+                            ))}
+                        </Picker>
+                        <CustomButton title="Update" onPress={handleUpdateStudent} />
+                        <CustomButton title="Cancel" onPress={() => setModalVisible(false)} />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
 
-const localStyles = StyleSheet.create({
-    centeredContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
+const { width } = Dimensions.get('window');
+
+const modalStyles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalView: {
+        width: width * 0.9,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        fontSize: 18,
+        fontWeight: "bold"
+    },
+    modalInput: {
+        width: '100%',
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+    },
+    modalPicker: {
+        width: '100%',
+        marginBottom: 20,
     },
 });
 
-// // screens/ManageStudentsScreen.js
-// import React, { useState, useEffect } from 'react';
-// import { View, Text, FlatList, TextInput, StyleSheet, Alert } from 'react-native';
-// import { getStudents, createStudent, updateStudent, deleteStudent } from '../api';
-// import CustomButton from '../components/CustomButton';
-// import Toast from 'react-native-toast-message';
-// import styles from "../styles";
-//
-// export default function ManageStudentsScreen() {
-//     const [students, setStudents] = useState([]);
-//     const [newStudentName, setNewStudentName] = useState('');
-//     const [newStudentEmail, setNewStudentEmail] = useState('');
-//     const [newStudentProgram, setNewStudentProgram] = useState('');
-//
-//     useEffect(() => {
-//         fetchStudents();
-//     }, []);
-//
-//     const fetchStudents = async () => {
-//         try {
-//             const response = await getStudents();
-//             setStudents(response.data);
-//         } catch (error) {
-//             console.error('Failed to fetch students', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to fetch students. Please try again.'
-//             });
-//         }
-//     };
-//
-//     const handleCreateStudent = async () => {
-//         try {
-//             await createStudent({ name: newStudentName, email: newStudentEmail, program: newStudentProgram });
-//             setNewStudentName('');
-//             setNewStudentEmail('');
-//             setNewStudentProgram('');
-//             fetchStudents();
-//             Toast.show({
-//                 type: 'success',
-//                 text1: 'Success',
-//                 text2: 'Student created successfully.'
-//             });
-//         } catch (error) {
-//             console.error('Failed to create student', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to create student. Please try again.'
-//             });
-//         }
-//     };
-//
-//     const handleUpdateStudent = async (id, updatedStudent) => {
-//         try {
-//             await updateStudent(id, updatedStudent);
-//             fetchStudents();
-//             Toast.show({
-//                 type: 'success',
-//                 text1: 'Success',
-//                 text2: 'Student updated successfully.'
-//             });
-//         } catch (error) {
-//             console.error('Failed to update student', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to update student. Please try again.'
-//             });
-//         }
-//     };
-//
-//     const handleDeleteStudent = async (id) => {
-//         try {
-//             await deleteStudent(id);
-//             fetchStudents();
-//             Toast.show({
-//                 type: 'success',
-//                 text1: 'Success',
-//                 text2: 'Student deleted successfully.'
-//             });
-//         } catch (error) {
-//             console.error('Failed to delete student', error);
-//             Toast.show({
-//                 type: 'error',
-//                 text1: 'Error',
-//                 text2: 'Failed to delete student. Please try again.'
-//             });
-//         }
-//     };
-//
-//     return (
-//         <View style={[styles.container, localStyles.centeredContainer]}>
-//             <Text style={styles.title}>Manage Students</Text>
-//             <View style={styles.inputContainer}>
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Student Name"
-//                     value={newStudentName}
-//                     onChangeText={setNewStudentName}
-//                     placeholderTextColor="gray"
-//                 />
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Student Email"
-//                     value={newStudentEmail}
-//                     onChangeText={setNewStudentEmail}
-//                     placeholderTextColor="gray"
-//                     keyboardType="email-address"
-//                 />
-//                 <TextInput
-//                     style={styles.input}
-//                     placeholder="Program"
-//                     value={newStudentProgram}
-//                     onChangeText={setNewStudentProgram}
-//                     placeholderTextColor="gray"
-//                 />
-//                 <CustomButton title="Add Student" onPress={handleCreateStudent} />
-//             </View>
-//             <FlatList
-//                 data={students}
-//                 keyExtractor={(item) => item.id.toString()}
-//                 renderItem={({ item }) => (
-//                     <View style={styles.itemContainer}>
-//                         <Text style={styles.itemName}>{item.name}</Text>
-//                         <Text style={styles.itemEmail}>{item.email}</Text>
-//                         <Text style={styles.itemProgram}>{item.program}</Text>
-//                         <CustomButton title="Edit" onPress={() => {
-//                             // Implement edit functionality
-//                             Alert.alert('Edit', 'Edit functionality to be implemented');
-//                         }} />
-//                         <CustomButton title="Delete" onPress={() => handleDeleteStudent(item.id)} />
-//                     </View>
-//                 )}
-//             />
-//         </View>
-//     );
-// }
-//
-// const localStyles = StyleSheet.create({
-//     centeredContainer: {
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//     },
-//     itemEmail: {
-//         fontSize: 14,
-//         color: 'gray',
-//     },
-//     itemProgram: {
-//         fontSize: 14,
-//         color: 'blue',
-//     },
-// });
+Object.assign(styles, modalStyles);
